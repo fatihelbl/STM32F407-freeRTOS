@@ -1,140 +1,88 @@
-# Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,c++,c
-# Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,c++,c
+# === STM32CubeIDE, C, C++, FreeRTOS için güncel .gitignore ===
 
-### C ###
-# Prerequisites
-*.d
+# CubeIDE Build Dizinleri
+**/Debug/
+**/Release/
+**/build/
+**/Binaries/
 
-# Object files
+# CubeMX ve CubeIDE Konfigürasyonları
+.cproject
+.project
+.settings/
+.metadata/
+*.launch
+*.log
+*.mxproject
+
+# Derleyici ve Linker Çıktıları
 *.o
-*.ko
-*.obj
+*.d
 *.elf
-
-# Linker output
-*.ilk
+*.hex
+*.bin
 *.map
-*.exp
+*.list
+*.lss
+*.su
+*.idb
+*.pdb
+*.mod*
+*.cmd
 
-# Precompiled Headers
+# Önceden Derlenmiş Headerlar
 *.gch
 *.pch
 
-# Libraries
-*.lib
+# Çeşitli Log ve Temp Dosyaları
+*.tmp
+*.bak
+*.swp
+*~
+
+# Kütüphane Dosyaları
 *.a
 *.la
 *.lo
+*.lib
 
-# Shared objects (inc. Windows DLLs)
-*.dll
+# Paylaşımlı Kütüphaneler
 *.so
 *.so.*
+*.dll
 *.dylib
 
-# Executables
+# Çıktı dosyaları (Linux/Windows/macOS)
 *.exe
 *.out
 *.app
 *.i*86
 *.x86_64
-*.hex
 
-# Debug files
-*.dSYM/
-*.su
-*.idb
-*.pdb
-
-# Kernel Module Compile Results
-*.mod*
-*.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
-
-### C++ ###
-# Prerequisites
-
-# Compiled Object files
-*.slo
-
-# Precompiled Headers
-
-# Compiled Dynamic libraries
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-
-# Executables
-
-### VisualStudioCode ###
-.vscode/*
+# VSCode Özgü
+.vscode/
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
 !.vscode/*.code-snippets
-
-# Local History for Visual Studio Code
 .history/
-
-# Built Visual Studio Code Extensions
 *.vsix
 
-### VisualStudioCode Patch ###
-# Ignore all local history of files
-.history
-.ionide
-# Object files
-*.o
-*.ko
-*.obj
-*.elf
+# CMake (Eğer kullanılırsa)
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
 
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
-
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
-
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
-
-# Misc
-*.map
-*.m
-*.png
-
-# Eclipse CDT project files
-.cproject
-.project
-.settings/
-
-# Vagrant directory
-.vagrant/
-
-# Include makefiles
-!Makefile
-*~
-
-# Libraries
-/lib
-# End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,c++,c
+# Diğer yaygın istemeyen dizinler
+.ipch/
+*.db
+*.opendb
+*.sdf
+*.tlog
+*.user
+*.orig
+*.log
+__pycache__/
+*.pyc
