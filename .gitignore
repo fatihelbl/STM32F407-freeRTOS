@@ -92,5 +92,49 @@ dkms.conf
 # Ignore all local history of files
 .history
 .ionide
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
 
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Misc
+*.map
+*.m
+*.png
+
+# Eclipse CDT project files
+.cproject
+.project
+.settings/
+
+# Vagrant directory
+.vagrant/
+
+# Include makefiles
+!Makefile
+*~
+
+# Libraries
+/lib
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,c++,c
