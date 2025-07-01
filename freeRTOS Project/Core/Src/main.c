@@ -21,6 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
 #include "FreeRTOS.h"
 #include "task.h"
 /* USER CODE END Includes */
@@ -41,6 +42,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+UART_HandleTypeDef huart4;
 
 /* USER CODE BEGIN PV */
 
@@ -49,9 +51,11 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_UART4_Init(void);
 /* USER CODE BEGIN PFP */
 static void task1_handler(void* parameters);
 static void task2_handler(void* parameters);
+HAL_StatusTypeDef UART_Write(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t size, uint32_t timeout);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -90,11 +94,12 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_UART4_Init();
   /* USER CODE BEGIN 2 */
-  status = xTaskCreate(task1_handler, "Task 1", 200, "from Task1", 2, task1_handle);
+  status = xTaskCreate(task1_handler, "Task 1", 400, "from Task1", 2, &task1_handle);
   configASSERT(status == pdPASS);
 
-  status = xTaskCreate(task2_handler, "Task 2", 200, "from Task2", 2, task2_handle);
+  status = xTaskCreate(task2_handler, "Task 2", 400, "from Task2", 2, &task2_handle);
   configASSERT(status == pdPASS);
 
   vTaskStartScheduler();
@@ -158,18 +163,64 @@ void SystemClock_Config(void)
 }
 
 /**
+  * @brief UART4 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_UART4_Init(void)
+{
+
+  /* USER CODE BEGIN UART4_Init 0 */
+
+  /* USER CODE END UART4_Init 0 */
+
+  /* USER CODE BEGIN UART4_Init 1 */
+
+  /* USER CODE END UART4_Init 1 */
+  huart4.Instance = UART4;
+  huart4.Init.BaudRate = 115200;
+  huart4.Init.WordLength = UART_WORDLENGTH_8B;
+  huart4.Init.StopBits = UART_STOPBITS_1;
+  huart4.Init.Parity = UART_PARITY_NONE;
+  huart4.Init.Mode = UART_MODE_TX_RX;
+  huart4.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart4.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN UART4_Init 2 */
+
+  /* USER CODE END UART4_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
   */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
   /* USER CODE BEGIN MX_GPIO_Init_1 */
 
   /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOH_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14|GPIO_PIN_15, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : PD14 PD15 */
+  GPIO_InitStruct.Pin = GPIO_PIN_14|GPIO_PIN_15;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
@@ -179,17 +230,41 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 static void task1_handler(void * parameters){
 
-	for (;;) {
+	while(1) {
 
+
+		uint8_t txData[] = "RTOS TASK1\r\n";
+		if(UART_Write(&huart4, txData, sizeof(txData), HAL_MAX_DELAY) != HAL_OK)
+		{
+			HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_14);
+		}
+		vTaskDelay(pdMS_TO_TICKS(500));
+		printf("%s\n",(char*)parameters);
 	}
 
 }
 static void task2_handler(void * parameters){
 
-	for (;;) {
+	while(1) {
+		HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_15);
 
+		vTaskDelay(pdMS_TO_TICKS(1000));
+		printf("%s\n",(char*)parameters);
 	}
 
+}
+HAL_StatusTypeDef UART_Write(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t size, uint32_t timeout)
+{
+    return HAL_UART_Transmit(huart, pData, size, timeout);
+}
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
+{
+    /* Bu fonksiyon bir task'in stack'i taştığında otomatik çalışır. */
+
+    printf("!! STACK OVERFLOW !! Task: %s\n", pcTaskName);
+
+    /* Burada LED yakmak, log atmak veya debug breakpoint koymak iyi fikir olabilir */
+    for(;;);  // Sistemi durdur (ya da reset atabilirsin)
 }
 /* USER CODE END 4 */
 
