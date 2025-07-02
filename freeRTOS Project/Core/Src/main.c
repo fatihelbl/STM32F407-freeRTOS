@@ -55,6 +55,7 @@ static void MX_UART4_Init(void);
 /* USER CODE BEGIN PFP */
 static void task1_handler(void* parameters);
 static void task2_handler(void* parameters);
+static void task3_handler(void * parameters);
 HAL_StatusTypeDef UART_Write(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t size, uint32_t timeout);
 /* USER CODE END PFP */
 
@@ -73,6 +74,7 @@ int main(void)
   /* USER CODE BEGIN 1 */
 	TaskHandle_t task1_handle;
 	TaskHandle_t task2_handle;
+	TaskHandle_t task3_handle;
 	BaseType_t status;
   /* USER CODE END 1 */
 
@@ -100,6 +102,9 @@ int main(void)
   configASSERT(status == pdPASS);
 
   status = xTaskCreate(task2_handler, "Task 2", 400, "from Task2", 2, &task2_handle);
+  configASSERT(status == pdPASS);
+
+  status = xTaskCreate(task3_handler, "Task 3", 400, "from Task3", 2, &task3_handle);
   configASSERT(status == pdPASS);
 
   vTaskStartScheduler();
@@ -213,10 +218,10 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14|GPIO_PIN_15, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : PD14 PD15 */
-  GPIO_InitStruct.Pin = GPIO_PIN_14|GPIO_PIN_15;
+  /*Configure GPIO pins : PD13 PD14 PD15 */
+  GPIO_InitStruct.Pin = GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -249,6 +254,18 @@ static void task2_handler(void * parameters){
 		HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_15);
 
 		vTaskDelay(pdMS_TO_TICKS(1000));
+		printf("%s\n",(char*)parameters);
+	}
+
+}
+static void task3_handler(void * parameters){
+
+	TickType_t last_wakeup_time;
+	last_wakeup_time = xTaskGetTickCount();
+	while(1) {
+		HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
+		vTaskDelayUntil(&last_wakeup_time,pdMS_TO_TICKS(100));
+		//TaskDelay(pdMS_TO_TICKS(500));
 		printf("%s\n",(char*)parameters);
 	}
 
