@@ -1,0 +1,88 @@
+# === STM32CubeIDE, C, C++, FreeRTOS için güncel .gitignore ===
+
+# CubeIDE Build Dizinleri
+**/Debug/
+**/Release/
+**/build/
+**/Binaries/
+
+# CubeMX ve CubeIDE Konfigürasyonları
+.cproject
+.project
+.settings/
+.metadata/
+*.launch
+*.log
+*.mxproject
+
+# Derleyici ve Linker Çıktıları
+*.o
+*.d
+*.elf
+*.hex
+*.bin
+*.map
+*.list
+*.lss
+*.su
+*.idb
+*.pdb
+*.mod*
+*.cmd
+
+# Önceden Derlenmiş Headerlar
+*.gch
+*.pch
+
+# Çeşitli Log ve Temp Dosyaları
+*.tmp
+*.bak
+*.swp
+*~
+
+# Kütüphane Dosyaları
+*.a
+*.la
+*.lo
+*.lib
+
+# Paylaşımlı Kütüphaneler
+*.so
+*.so.*
+*.dll
+*.dylib
+
+# Çıktı dosyaları (Linux/Windows/macOS)
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+
+# VSCode Özgü
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+.history/
+*.vsix
+
+# CMake (Eğer kullanılırsa)
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Diğer yaygın istemeyen dizinler
+.ipch/
+*.db
+*.opendb
+*.sdf
+*.tlog
+*.user
+*.orig
+*.log
+__pycache__/
+*.pyc
