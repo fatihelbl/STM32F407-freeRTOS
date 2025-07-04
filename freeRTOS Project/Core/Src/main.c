@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include "FreeRTOS.h"
 #include "task.h"
+#include "queue.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,6 +48,15 @@ RTC_HandleTypeDef hrtc;
 UART_HandleTypeDef huart4;
 
 /* USER CODE BEGIN PV */
+TaskHandle_t handle_menu_task;
+TaskHandle_t handle_cmd_task;
+TaskHandle_t handle_print_task;
+TaskHandle_t handle_led_task;
+TaskHandle_t handle_rtc_task;
+
+QueueHandle_t q_data;
+QueueHandle_t q_print;
+
 
 /* USER CODE END PV */
 
@@ -56,9 +66,7 @@ static void MX_GPIO_Init(void);
 static void MX_UART4_Init(void);
 static void MX_RTC_Init(void);
 /* USER CODE BEGIN PFP */
-static void task1_handler(void* parameters);
-static void task2_handler(void* parameters);
-static void task3_handler(void * parameters);
+
 HAL_StatusTypeDef UART_Write(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t size, uint32_t timeout);
 /* USER CODE END PFP */
 
@@ -75,9 +83,6 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-	TaskHandle_t task1_handle;
-	TaskHandle_t task2_handle;
-	TaskHandle_t task3_handle;
 	BaseType_t status;
   /* USER CODE END 1 */
 
@@ -102,14 +107,26 @@ int main(void)
   MX_UART4_Init();
   MX_RTC_Init();
   /* USER CODE BEGIN 2 */
-  status = xTaskCreate(task1_handler, "Task 1", 400, "from Task1", 2, &task1_handle);
+  status = xTaskCreate(menu_task, "menu_task", 250, NULL, 2, &handle_menu_task);
   configASSERT(status == pdPASS);
 
-  status = xTaskCreate(task2_handler, "Task 2", 400, "from Task2", 2, &task2_handle);
+  status = xTaskCreate(cmd_handler_task, "cmd_task", 250, NULL, 2, &handle_cmd_task);
   configASSERT(status == pdPASS);
 
-  status = xTaskCreate(task3_handler, "Task 3", 400, "from Task3", 2, &task3_handle);
+  status = xTaskCreate(print_task, "print_task", 250,NULL, 2, &handle_print_task);
   configASSERT(status == pdPASS);
+
+  status = xTaskCreate(led_task, "led_task", 250,NULL, 2, &handle_led_task);
+  configASSERT(status == pdPASS);
+
+  status = xTaskCreate(rtc_task, "rtc_task", 250,NULL, 2, &handle_rtc_task);
+  configASSERT(status == pdPASS);
+
+  q_data = xQueueCreate(10,sizeof(char));
+  configASSERT(q_data != NULL);
+
+  q_print = xQueueCreate(10,sizeof(size_t));
+  configASSERT(q_print != NULL);
 
   vTaskStartScheduler();
   /* USER CODE END 2 */
@@ -280,47 +297,7 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-static void task1_handler(void * parameters){
 
-	while(1) {
-
-
-		uint8_t txData[] = "RTOS TASK1\r\n";
-		if(UART_Write(&huart4, txData, sizeof(txData), HAL_MAX_DELAY) != HAL_OK)
-		{
-			HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_14);
-		}
-		vTaskDelay(pdMS_TO_TICKS(500));
-		printf("%s\n",(char*)parameters);
-	}
-
-}
-static void task2_handler(void * parameters){
-
-	while(1) {
-		HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_15);
-
-		vTaskDelay(pdMS_TO_TICKS(1000));
-		printf("%s\n",(char*)parameters);
-	}
-
-}
-static void task3_handler(void * parameters){
-
-	TickType_t last_wakeup_time;
-	last_wakeup_time = xTaskGetTickCount();
-	while(1) {
-		HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
-		vTaskDelayUntil(&last_wakeup_time,pdMS_TO_TICKS(100));
-		//TaskDelay(pdMS_TO_TICKS(500));
-		printf("%s\n",(char*)parameters);
-	}
-
-}
-HAL_StatusTypeDef UART_Write(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t size, uint32_t timeout)
-{
-    return HAL_UART_Transmit(huart, pData, size, timeout);
-}
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
 {
     /* Bu fonksiyon bir task'in stack'i taştığında otomatik çalışır. */
