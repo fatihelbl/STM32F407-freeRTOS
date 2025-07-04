@@ -57,7 +57,7 @@ TaskHandle_t handle_rtc_task;
 QueueHandle_t q_data;
 QueueHandle_t q_print;
 
-
+volatile uint8_t user_data;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -127,7 +127,7 @@ int main(void)
 
   q_print = xQueueCreate(10,sizeof(size_t));
   configASSERT(q_print != NULL);
-
+  HAL_UART_Receive_IT(&huart4, &user_data,1);
   vTaskStartScheduler();
   /* USER CODE END 2 */
 
@@ -297,7 +297,29 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if(! xQueueIsQueueFullFromISR(q_data)){
 
+		xQueueSendFromISR(q_data,(void*)&user_data,NULL);
+	} else {
+
+		if(user_data == '\n') {
+
+			xQueueReceiveFromISR(q_data, (void*)&user_data, NULL);
+			xQueueSendFromISR(q_data,(void*)&user_data,NULL);
+		}
+
+	}
+
+	if(user_data == '\n'){
+
+		xTaskNotifyFromISR(handle_cmd_task,0,eNoAction,NULL);
+	}
+
+	HAL_UART_Receive_IT(&huart4, (uint8_t*)&user_data, 1);
+
+}
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
 {
     /* Bu fonksiyon bir task'in stack'i taştığında otomatik çalışır. */
