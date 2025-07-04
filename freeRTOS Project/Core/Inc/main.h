@@ -81,11 +81,14 @@ extern state_t curr_state;
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-extern void menu_task(void*param);
-extern void led_task(void*param);
-extern void rtc_task(void*param);
-extern void print_task(void*param);
-extern void cmd_handler_task(void*param);
+void menu_task(void*param);
+void led_task(void*param);
+void rtc_task(void*param);
+void print_task(void*param);
+void cmd_handler_task(void*param);
+void led_effect_stop(void);
+void led_effect(int n);
+
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

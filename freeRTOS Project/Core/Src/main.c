@@ -309,7 +309,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 		if(user_data == '\n') {
 
-			xQueueReceiveFromISR(q_data, (void*)&dummy, NULL);
+			xQueueReceiveFromISR(q_data, (void*)&dummy, NULL); // eski veri çıkarılır
 			xQueueSendFromISR(q_data,(void*)&user_data,NULL);
 		}
 
