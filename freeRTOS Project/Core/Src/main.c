@@ -53,11 +53,13 @@ TaskHandle_t handle_cmd_task;
 TaskHandle_t handle_print_task;
 TaskHandle_t handle_led_task;
 TaskHandle_t handle_rtc_task;
+
 QueueHandle_t q_data;
 QueueHandle_t q_print;
 
+//software timer
+TimerHandle_t handle_led_timer[4];
 volatile uint8_t user_data;
-
 state_t curr_state =sMainMenu;
 /* USER CODE END PV */
 
@@ -67,7 +69,7 @@ static void MX_GPIO_Init(void);
 static void MX_UART4_Init(void);
 static void MX_RTC_Init(void);
 /* USER CODE BEGIN PFP */
-
+void led_effect_callback(TimerHandle_t xTimer);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -119,8 +121,8 @@ int main(void)
   status = xTaskCreate(led_task, "led_task", 250,NULL, 2, &handle_led_task);
   configASSERT(status == pdPASS);
 
-  status = xTaskCreate(rtc_task, "rtc_task", 250,NULL, 2, &handle_rtc_task);
-  configASSERT(status == pdPASS);
+//  status = xTaskCreate(rtc_task, "rtc_task", 250,NULL, 2, &handle_rtc_task);
+//  configASSERT(status == pdPASS);
 
   q_data = xQueueCreate(10,sizeof(char));
   configASSERT(q_data != NULL);
@@ -128,7 +130,13 @@ int main(void)
   q_print = xQueueCreate(10,sizeof(size_t));
   configASSERT(q_print != NULL);
 
-  HAL_UART_Receive_IT(&huart4, &user_data,1);
+
+  for ( int i = 0;  i < 4; i++) {
+
+	  handle_led_timer[i] = xTimerCreate("led_timer",pdMS_TO_TICKS(500),pdTRUE,(void*)(i+1),led_effect_callback);
+  }
+
+  HAL_UART_Receive_IT(&huart4, (uint8_t*)&user_data,1);
 
   vTaskStartScheduler();
   /* USER CODE END 2 */
@@ -299,6 +307,27 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void led_effect_callback(TimerHandle_t xTimer){
+
+	int id;
+	id = (uint32_t) pvTimerGetTimerID(xTimer);
+	switch (id) {
+		case 1:
+			LED_effect1();
+			break;
+		case 2:
+			LED_effect2();
+			break;
+		case 3:
+			LED_effect3();
+			break;
+		case 4:
+			LED_effect4();
+			break;
+		default:
+			break;
+	}
+}
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	uint8_t dummy;

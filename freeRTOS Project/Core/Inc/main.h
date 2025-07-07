@@ -27,11 +27,12 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "string.h""
+#include "string.h"
 #include "stm32f4xx_hal.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
+#include  "timers.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -65,6 +66,10 @@ extern QueueHandle_t q_print;
 
 extern volatile uint8_t user_data;
 extern state_t curr_state;
+
+extern TimerHandle_t handle_led_timer[4];
+
+extern UART_HandleTypeDef huart4;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -88,6 +93,15 @@ void print_task(void*param);
 void cmd_handler_task(void*param);
 void led_effect_stop(void);
 void led_effect(int n);
+
+void LED_effect1(void);
+void LED_effect2(void);
+void LED_effect3(void);
+void LED_effect4(void);
+void turn_off_all_leds(void);
+void turn_on_all_leds(void);
+void turn_on_odd_leds(void);
+void turn_on_even_leds(void);
 
 /* USER CODE END EFP */
 

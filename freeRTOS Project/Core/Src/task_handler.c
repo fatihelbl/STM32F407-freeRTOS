@@ -19,7 +19,7 @@ void menu_task(void* param){
 						  "========================\n"
 						  		"Led effect ----->0\n"
 						  		"Date and time--->1\n"
-						  		"Exit       ----->0\n"
+						  		"Exit       ----->2\n"
 						  		"Enter your choice here: ";
 
 	while(1){
@@ -50,6 +50,7 @@ void menu_task(void* param){
 		}else {
 			//invalid entry
 			xQueueSend(q_print,&msg_inv,portMAX_DELAY);
+			continue;
 		}
 
 		//wait to run again when some other task notifies
@@ -104,7 +105,10 @@ void rtc_task(void* param){
 }
 void print_task(void* param){
 
+	uint32_t *msg;
 	while(1){
+		xQueueReceive(q_print, &msg, portMAX_DELAY);
+		HAL_UART_Transmit(&huart4, (uint8_t *)msg, strlen(msg), HAL_MAX_DELAY);
 
 	}
 }
